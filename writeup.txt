@@ -1,0 +1,21 @@
+The webcrawler first extracts the html source for a url, and looks for the content inside href tags.
+A filter will then check the href tag to make sure of the following:
+	
+	1.  It is a html file
+	2.  It is no older than 2 months
+	3.  Link belongs to the cnn root domain
+
+If the href found fulfills the 3 requirments above, it gets added to a link queue, where its eventually going 
+to be scrapped for more href tags.
+
+URLs that have been crawled are stored in an azure storage table called "urltable".  Performance metrics such
+as ram available, cpu utilization, and # of crawled url count are stored in a azure table called "performance" table.
+
+The WebRole fetches performance metrics and the last 10 url crawled and displays it on index.html.  The WorkerRole
+does all the crawling and URL validations.
+
+To facilitate communications between the WebRole and Worker role, an azure queue called "commandqueue" allows the
+WebRole to send 'start' or 'stop' crawling messages to the WorkerRole.  Using a seperate communication queue in addition
+to the "linkqueue" (linkqueue contains URL that have yet to be crawled), ensures that the crawler can be immediately stopped.
+
+  
